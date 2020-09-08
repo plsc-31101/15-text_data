@@ -9,10 +9,10 @@ output: html_document
 
 This unit focuses on computational text analysis (or "text-as-data"). We'll explore:
 
-1. **[Preprocessing]** a corpus for common text analysis.
-2. **[Sentiment Analysis and Dictionary Methods]**, a simple, supervised method for classification.
-3. **[Distinctive Words]**, or word-separating techniques to compare corpora.
-4. **[Structural Topic Models]**, a popular unsupervised method for text exploration and analysis.
+1. **Preprocessing** a corpus for common text analysis.
+2. **Sentiment Analysis and Dictionary Methods**, a simple, supervised method for classification.
+3. **Distinctive Words**, or word-separating techniques to compare corpora.
+4. **Structural Topic Models**, a popular unsupervised method for text exploration and analysis.
 
 These materials are based off a longer, week-long intensive workshop on computational text analysis. If you're interested in text-as-data, I would encourage you to work through these materials on your own: https://github.com/rochelleterman/FSUtext
 

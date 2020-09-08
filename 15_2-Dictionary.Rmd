@@ -17,8 +17,6 @@ require(tidytext)
 require(tidyverse)
 require(stringr)
 require(textdata)
-
-ts <- read.csv("data/taylor_swift.csv")
 ```
 
 ### Preprocessing and Setup
@@ -32,6 +30,8 @@ First we must preprocess the corpus. Create a document-term matrix from the `lyr
 **Think**: Why is stemming inappropriate for this application?
 
 ```{r}
+ts <- read.csv("data/taylor_swift.csv")
+
 # preprocess and create DTM
 docs <- Corpus(VectorSource(ts$lyrics))
 

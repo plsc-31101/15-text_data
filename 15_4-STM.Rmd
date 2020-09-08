@@ -57,7 +57,7 @@ We're now going to estimate a topic model with 15 topics by regressing topical p
 
 Running full model takes a **long** time to finish. For that reason, we're going to add an argument `max.em.its` which sets the number of iterations. By keeping it low (15) we'll see a rough estimate of the topics. You can always go back and estimate the model to convergence.    
 
-```{r message=FALSE}
+```{r results="hide" }
 model <- stm(docs, vocab, 15, prevalence = ~ REGION + s(YEAR), data = meta, seed = 15, max.em.its = 15)
 ```
 
