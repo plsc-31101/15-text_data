@@ -7,72 +7,72 @@ output: html_document
 
 # Text Analysis
 
-This unit focuses on computational text analysis (or "text-as-data"). We'll explore:
+This unit focuses on computational text analysis (or "text-as-data"). We will explore:
 
 1. **Preprocessing** a corpus for common text analysis.
 2. **Sentiment Analysis and Dictionary Methods**, a simple, supervised method for classification.
 3. **Distinctive Words**, or word-separating techniques to compare corpora.
 4. **Structural Topic Models**, a popular unsupervised method for text exploration and analysis.
 
-These materials are based off a longer, week-long intensive workshop on computational text analysis. If you're interested in text-as-data, I would encourage you to work through these materials on your own: https://github.com/rochelleterman/FSUtext
+These materials are based off a longer, week-long intensive workshop on computational text analysis. If you are interested in text-as-data, I would encourage you to work through these materials on your own: https://github.com/rochelleterman/FSUtext
 
 
 ## Preprocessing
 
-First let's load our required packages.
+First let's load our required packages:
 
 ```{r message=F}
 library(tm) # Framework for text mining
-library(tidyverse) # Data preparation and pipes $>$
-library(ggplot2) # for plotting word frequencies
-library(wordcloud) # wordclouds!
+library(tidyverse) # Data preparation and pipes %>%
+library(ggplot2) # For plotting word frequencies
+library(wordcloud) # Wordclouds!
 ```
 
 A __corpus__ is a collection of texts, usually stored electronically, and from which we perform our analysis. A corpus might be a collection of news articles from Reuters or the published works of Shakespeare. 
 
-Within each corpus we will have separate articles, stories, volumes, each treated as a separate entity or record. Each unit is called a __document.__
+Within each corpus we will have separate articles, stories, volumes, etc., each treated as a separate entity or record. Each unit is called a __document__.
 
-For this unit, we will be using a section of Machiavelli's Prince as our corpus. Since The Prince is a monograph, we have already "chunked" the text, so that each short paragraph or "chunk" is considered a "document."
+For this unit, we will be using a section of Machiavelli's Prince as our corpus. Since The Prince is a monograph, we have already "chunked" the text so that each short paragraph or "chunk" is considered a "document."
 
 ### From Words to Numbers
 
 #### Corpus Readers {-}
 
-The `tm` package supports a variety of sources and formats. Run the code below to see what it includes
+The `tm` package supports a variety of sources and formats. Run the code below to see what it includes.
 
 ```{r}
 getSources()
 getReaders()
 ```
 
-Here we'll be reading documents from a csv file. Each row being a document, and columns for text and metadata (information about each document). This is the easiest option if you have metadata.
+Here we will be reading documents from a CSV file in which each row is a document that includes columns for text and metadata (information about each document). This is the easiest option if you have metadata.
 
 ```{r}
-docs.df <-read.csv("data/mach.csv", header=TRUE) #read in CSV file
+docs.df <-read.csv("data/mach.csv", header=TRUE) # Read in CSV file
 docs.df <- docs.df %>%
   mutate(text = str_conv(text, "UTF-8"))
 docs <- Corpus(VectorSource(docs.df$text))
 docs
 ```
 
-Once we have the corpus, we can inspect the documents using inspect()
+Once we have the corpus, we can inspect the documents using `inspect()`.
 
 ```{r}
-# see the 16th document
+# See the 16th document
 inspect(docs[16])
 ```
 
-#### Preprocessing functions {-}
+#### Preprocessing Functions {-}
 
-Many text analysis applications follow a similar 'recipe' for preprecessing, involving (the order of these steps might differ as per application):
+Many text analysis applications follow a similar 'recipe' for preprocessing, involving (the order of these steps might differ as per application)
 
-1. Tokenizing the text to unigrams (or bigrams, or trigrams)
-2. Converting all characters to lowercase
-3. Removing punctuation
-4. Removing numbers
-5. Removing Stop Words, inclugind custom stop words
-6. "Stemming" words, or lemmitization. There are several stemming alogrithms. Porter is the most popular.
-7. Creating a Document-Term Matrix
+1. Tokenizing the text to unigrams (or bigrams, or trigrams).
+2. Converting all characters to lowercase.
+3. Removing punctuation.
+4. Removing numbers.
+5. Removing Stop Words, inclugind custom stop words.
+6. "Stemming" words, or lemmitization. There are several stemming algorithms. Porter is the most popular.
+7. Creating a Document-Term Matrix.
 
 `tm` lets us convert a corpus to a DTM while completing the pre-processing steps in one step.
 
@@ -87,7 +87,7 @@ dtm <- DocumentTermMatrix(docs,
 
 #### Weighting {-}
 
-One common pre-processing step that some applicaitons may call for is applying tf-idf weights. The [tf-idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf), or term frequency-inverse document frequency, is a weight that ranks the importance of a term in its contextual document corpus. The tf-idf value increases proportionally to the number of times a word appears in the document, but is offset by the frequency of the word in the corpus, which helps to adjust for the fact that some words appear more frequently in general. In other words, it places importance on terms frequent in the document but rare in the corpus.
+One common pre-processing step that some applications may call for is applying tf-idf weights. The [tf-idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf), or term frequency-inverse document frequency, is a weight that ranks the importance of a term in its contextual document corpus. The tf-idf value increases proportionally to the number of times a word appears in the document, but is offset by the frequency of the word in the corpus, which helps to adjust for the fact that some words appear more frequently in general. In other words, it places importance on terms frequent in the document but rare in the corpus.
 
 ```{r}
 dtm.weighted <- DocumentTermMatrix(docs,
@@ -99,7 +99,7 @@ dtm.weighted <- DocumentTermMatrix(docs,
                           stemming=TRUE))
 ```
 
-Compare first 5 rows and 5 columns of the `dtm` and `dtm.weighted`. What do you notice?
+Compare the first 5 rows and 5 columns of the `dtm` and `dtm.weighted`. What do you notice?
 
 ```{r}
 inspect(dtm[1:5,1:5])
@@ -113,25 +113,25 @@ inspect(dtm.weighted[1:5,1:5])
 Let's look at the structure of our DTM. Print the dimensions of the DTM. How many documents do we have? How many terms?
 
 ```{r}
-# how many documents? how many terms?
+# How many documents? How many terms?
 dim(dtm)
 ```
 
 #### Frequencies {-}
 
-We can obtain the term frequencies as a vector by converting the document term matrix into a matrix and using `colSums` to sum the column counts:
+We can obtain the term frequencies as a vector by converting the document term matrix into a matrix and using `colSums` to sum the column counts.
 
 ```{r}
- # how many terms?
+# How many terms?
 freq <- colSums(as.matrix(dtm))
 freq[1:5]
 length(freq)
 ```
 
-By ordering the frequencies we can list the most frequent terms and the least frequent terms.
+By ordering the frequencies, we can list the most frequent terms and the least frequent terms.
 
 ```{r}
-# order
+# Order
 sorted <- sort(freq, decreasing = T)
 
 # Most frequent terms
@@ -141,28 +141,28 @@ head(sorted)
 tail(sorted)
 ```
 
-#### Plotting frequencies {-}
+#### Plotting Frequencies {-}
 
 Let's make a plot that shows the frequency of frequencies for the terms. (For example, how many words are used only once? 5 times? 10 times?)
 
 ```{r}
-# frequency of frenquencies
+# Frequency of frenquencies
 head(table(freq),15)
 tail(table(freq),15)
 
-# plot
+# Plot
 plot(table(freq))
 ```
 
 What does this tell us about the nature of language?
 
-#### Exploring common words {-}
+#### Exploring Common Words {-}
 
-The TM package has lots of useful functions to help you explore common words and associations:
+The `tm` package has lots of useful functions to help you explore common words and associations:
 
 ```{r}
 # Have a look at common words
-findFreqTerms(dtm, lowfreq=50) # words that appear at least 100 times
+findFreqTerms(dtm, lowfreq=50) # Words that appear at least 50 times
 
 # Which words correlate with "war"?
 findAssocs(dtm, "war", 0.3)
@@ -171,14 +171,14 @@ findAssocs(dtm, "war", 0.3)
 We can even make wordclouds showing the most commons terms:
 
 ```{r}
-# wordcoulds!
+# Wordclouds!
 set.seed(123)
 wordcloud(names(sorted), sorted, max.words=100, colors=brewer.pal(6,"Dark2"))
 ```
 
-#### Remove sparse terms {-}
+#### Removing Sparse Terms {-}
 
-Somtimes we want to remove sparse terms and thus inrease efficency. Look up the help file for the function `removeSparseTerms`. Using this function, create an objected called `dtm.s` that contains only terms with <.9 sparsity (meaning they appear in more than 10% of documents).
+Somtimes we want to remove sparse terms and, thus, increase efficency. Look up the help file for the function `removeSparseTerms`. Using this function, create an object called `dtm.s` that contains only terms with <.9 sparsity (meaning they appear in more than 10% of documents).
 
 ```{r}
 dtm.s <- removeSparseTerms(dtm,.9)
@@ -188,22 +188,22 @@ dtm.s
 
 ### Exporting the DTM
 
-We can convert a DTM to a matrix or data.frame in order to write to a csv, add meta data, etc.
+We can convert a DTM to a matrix or dataframe in order to write it to a CSV, add metadata, etc.
 
-First create an object that converts the `dtm` to a dataframe (we first have to convert to matrix, and then to dataframe)
+First, create an object that converts the DTM to a dataframe (we first have to convert it to a matrix and then to a dataframe):
 
 ```{r}
-# coerce into dataframe
+# Coerce into dataframe
 dtm <- as.data.frame(as.matrix(dtm))
-names(dtm)[1:10]  # names of documents
+names(dtm)[1:10]  # Names of documents
 
-# write csv
+# Write CSV
 write.csv(dtm, "dtm.csv", row.names = F)
 ```
 
-### Challenges
+#### Challenge.
 
-Using the one of the datasetes in the `data` directory, create a document term matrix and create a wordcloud of the most common terms.
+Using one of the datasets in the `data` directory, create a document term matrix and a wordcloud of the most common terms.
 
 ```{r eval = F}
 # YOUR CODE HERE
